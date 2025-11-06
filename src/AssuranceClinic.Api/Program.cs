@@ -5,7 +5,7 @@ using AssuranceClinic.Infrastructure.Persistence;
 using Microsoft.OpenApi.Models;
 using Npgsql;
 using System.Data;
-
+//changed from stash to crud
 var builder = WebApplication.CreateBuilder(args);
 
 // -----------------------------------------------------------
