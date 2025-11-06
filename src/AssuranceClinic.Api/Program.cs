@@ -46,7 +46,7 @@ builder.Services.AddMemoryCache();
 var app = builder.Build();
 
 // -----------------------------------------------------------
-// 🔹 Configure Middleware
+//  Configure Middleware
 // -----------------------------------------------------------
 if (app.Environment.IsDevelopment())
 {
@@ -63,7 +63,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // -----------------------------------------------------------
-// 🔹 Auto Open Swagger Page (Optional)
+//  Auto Open Swagger Page (Optional)
 // -----------------------------------------------------------
 var swaggerUrl = "https://localhost:51780/swagger/index.html";
 try
