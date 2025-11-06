@@ -13,8 +13,18 @@ namespace AssuranceClinic.Application.Services
             _repo = repo;
         }
 
-        public async Task<IEnumerable<Doctor>> GetAllAsync() => await _repo.GetDoctorsAsync();
+        public async Task<IEnumerable<Doctor>> GetAllDoctorsAsync()
+        {
+            return await _repo.GetDoctorsAsync();
+        }
 
-        public async Task<int> CreateAsync(Doctor doctor) => await _repo.AddDoctorAsync(doctor);
+        public async Task<int> AddDoctorAsync(Doctor doctor)
+        {
+            return await _repo.AddDoctorAsync(doctor);
+        }
+        public async Task<int> CreateAsync(Doctor doctor)
+        {
+            return await _repo.AddDoctorAsync(doctor);
+        }
     }
 }

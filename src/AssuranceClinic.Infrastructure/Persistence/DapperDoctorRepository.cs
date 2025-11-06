@@ -4,7 +4,7 @@ using Dapper;
 using System.Data;
 
 namespace AssuranceClinic.Infrastructure.Persistence
-{ 
+{
     public class DapperDoctorRepository : IDoctorRepository
     {
         private readonly Func<IDbConnection> _connectionFactory;
@@ -17,14 +17,14 @@ namespace AssuranceClinic.Infrastructure.Persistence
         public async Task<IEnumerable<Doctor>> GetDoctorsAsync()
         {
             using var conn = _connectionFactory();
-            const string sql = "SELECT doctor_id AS Id, name, specialty AS Specialty, contact AS Contact FROM doctor;";
+            var sql = "SELECT doctor_id as Id, name, specialty FROM doctor";
             return await conn.QueryAsync<Doctor>(sql);
         }
 
         public async Task<int> AddDoctorAsync(Doctor doctor)
         {
             using var conn = _connectionFactory();
-            const string sql = "INSERT INTO doctor (name, specialty, contact) VALUES (@Name, @Specialty, @Contact);";
+            var sql = "INSERT INTO doctor (name, specialty) VALUES (@Name, @Specialty)";
             return await conn.ExecuteAsync(sql, doctor);
         }
     }

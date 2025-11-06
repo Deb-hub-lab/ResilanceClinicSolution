@@ -1,93 +1,75 @@
-﻿//using AssuranceClinic.Api.Extensions;
+﻿using AssuranceClinic.Application;
 using AssuranceClinic.Application.Interfaces;
 using AssuranceClinic.Application.Services;
-using AssuranceClinic.Domain.Interfaces;
-using AssuranceClinic.Infrastructure.Persistence;
+using AssuranceClinic.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
-using Npgsql;
-using System.Data;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
-using AssuranceClinic.Infrastructure; // ✅ add this at the top
-using AssuranceClinic.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// -----------------------------------------------------------
-// 🔹 Configure Services (DI container)
-// -----------------------------------------------------------
+// ----------------------------
+// Controllers
+// ----------------------------
 builder.Services.AddControllers();
 
-// Swagger Configuration
+// ----------------------------
+// API Versioning
+// ----------------------------
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new QueryStringApiVersionReader("api-version"),
+        new HeaderApiVersionReader("X-Api-Version")
+    );
+});
+
+// Versioned API Explorer (required for Swagger)
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV"; // v1, v2
+    options.SubstituteApiVersionInUrl = true;
+});
+
+// ----------------------------
+// Swagger
+// ----------------------------
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "ResilanceClinic API",
-        Version = "v1",
-        Description = "API documentation for ResilanceClinic using Dapper + PostgreSQL"
-    });
-});
+builder.Services.AddSwaggerGen();
 
-// Register Dapper connection factory
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddScoped<Func<IDbConnection>>(_ =>
-{
-    return () => new NpgsqlConnection(connectionString);
-});
-
-//// Application Services
-//builder.Services.AddScoped<IPatientService, PatientService>();
-//builder.Services.AddScoped<IDoctorService, DoctorService>();
-
-//// Register Repositories
-//builder.Services.AddScoped<IPatientRepository, DapperPatientRepository>();
-//builder.Services.AddScoped<IDoctorRepository, DapperDoctorRepository>();
-// 🔹 Add layer dependencies
+// ----------------------------
+// DI: Application + Infrastructure
+// ----------------------------
 builder.Services.AddApplicationServices();
-//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-// Add Memory Cache
-builder.Services.AddMemoryCache();
-
+// ----------------------------
+// Build app
+// ----------------------------
 var app = builder.Build();
 
-// -----------------------------------------------------------
-//  Configure Middleware
-// -----------------------------------------------------------
+// ----------------------------
+// Swagger UI
+// ----------------------------
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "AssuranceClinic API v1");
-        c.RoutePrefix = string.Empty; // Swagger opens at root
+        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+        foreach (var desc in provider.ApiVersionDescriptions)
+        {
+            c.SwaggerEndpoint($"/swagger/{desc.GroupName}/swagger.json", desc.GroupName.ToUpperInvariant());
+        }
+        c.RoutePrefix = string.Empty; // Swagger at root
     });
 }
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-
-// -----------------------------------------------------------
-//  Auto Open Swagger Page (Optional)
-// -----------------------------------------------------------
-var swaggerUrl = "https://localhost:51780/swagger/index.html";
-try
-{
-    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-    {
-        FileName = swaggerUrl,
-        UseShellExecute = true
-    });
-}
-catch
-{
-    Console.WriteLine($"Swagger UI available at: {swaggerUrl}");
-}
-
 app.Run();

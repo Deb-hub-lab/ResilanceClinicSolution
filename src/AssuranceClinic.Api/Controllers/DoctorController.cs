@@ -5,23 +5,37 @@ using Microsoft.AspNetCore.Mvc;
 namespace AssuranceClinic.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     public class DoctorController : ControllerBase
     {
-        private readonly IDoctorService _service;
+        private readonly IDoctorService _doctorService;
 
-        public DoctorController(IDoctorService service)
+        public DoctorController(IDoctorService doctorService)
         {
-            _service = service;
+            _doctorService = doctorService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll() => Ok(await _service.GetAllAsync());
+        [MapToApiVersion("1.0")]
+        public async Task<IActionResult> GetDoctorsV1()
+        {
+            var doctors = await _doctorService.GetAllDoctorsAsync();
+            return Ok(doctors);
+        }
 
+        [HttpGet]
+        [MapToApiVersion("2.0")]
+        public async Task<IActionResult> GetDoctorsV2()
+        {
+            var doctors = await _doctorService.GetAllDoctorsAsync();
+            return Ok(new { Total = doctors.Count(), Doctors = doctors });
+        }
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] Doctor doctor)
         {
-            var rows = await _service.CreateAsync(doctor);
+            var rows = await _doctorService.CreateAsync(doctor);
             return Ok(new { RowsAffected = rows });
         }
     }
