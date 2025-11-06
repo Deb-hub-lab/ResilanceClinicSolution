@@ -5,7 +5,8 @@ using AssuranceClinic.Infrastructure.Persistence;
 using Microsoft.OpenApi.Models;
 using Npgsql;
 using System.Data;
-//changed from stash to crud
+//It is Statsh brnach change for cherypick
+//It is Statsh brnach change for cherypick 1002
 var builder = WebApplication.CreateBuilder(args);
 
 // -----------------------------------------------------------
