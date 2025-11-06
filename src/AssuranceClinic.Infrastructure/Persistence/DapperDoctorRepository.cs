@@ -4,7 +4,7 @@ using Dapper;
 using System.Data;
 
 namespace AssuranceClinic.Infrastructure.Persistence
-{
+{ 
     public class DapperDoctorRepository : IDoctorRepository
     {
         private readonly Func<IDbConnection> _connectionFactory;
