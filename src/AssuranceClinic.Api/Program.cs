@@ -1,10 +1,15 @@
-﻿using AssuranceClinic.Application.Interfaces;
+﻿//using AssuranceClinic.Api.Extensions;
+using AssuranceClinic.Application.Interfaces;
 using AssuranceClinic.Application.Services;
 using AssuranceClinic.Domain.Interfaces;
 using AssuranceClinic.Infrastructure.Persistence;
 using Microsoft.OpenApi.Models;
 using Npgsql;
 using System.Data;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
+using AssuranceClinic.Infrastructure; // ✅ add this at the top
+using AssuranceClinic.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,13 +37,19 @@ builder.Services.AddScoped<Func<IDbConnection>>(_ =>
     return () => new NpgsqlConnection(connectionString);
 });
 
-// Application Services
-builder.Services.AddScoped<IPatientService, PatientService>();
-builder.Services.AddScoped<IDoctorService, DoctorService>();
+//// Application Services
+//builder.Services.AddScoped<IPatientService, PatientService>();
+//builder.Services.AddScoped<IDoctorService, DoctorService>();
 
-// Register Repositories
-builder.Services.AddScoped<IPatientRepository, DapperPatientRepository>();
-builder.Services.AddScoped<IDoctorRepository, DapperDoctorRepository>();
+//// Register Repositories
+//builder.Services.AddScoped<IPatientRepository, DapperPatientRepository>();
+//builder.Services.AddScoped<IDoctorRepository, DapperDoctorRepository>();
+// 🔹 Add layer dependencies
+builder.Services.AddApplicationServices();
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // Add Memory Cache
 builder.Services.AddMemoryCache();
@@ -46,7 +57,7 @@ builder.Services.AddMemoryCache();
 var app = builder.Build();
 
 // -----------------------------------------------------------
-// 🔹 Configure Middleware
+//  Configure Middleware
 // -----------------------------------------------------------
 if (app.Environment.IsDevelopment())
 {
@@ -63,7 +74,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // -----------------------------------------------------------
-// 🔹 Auto Open Swagger Page (Optional)
+//  Auto Open Swagger Page (Optional)
 // -----------------------------------------------------------
 var swaggerUrl = "https://localhost:51780/swagger/index.html";
 try
