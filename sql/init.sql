@@ -1,10 +1,10 @@
--- CREATE DATABASE assuranceclinic;
--- \c assuranceclinic
+-- CREATE DATABASE resilienceclinic;
+-- \c resilienceclinic
 
 CREATE TABLE IF NOT EXISTS doctor (
     doctor_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    specialty VARCHAR(100),
+    specialty VARCHAR(100) NOT NULL,
     contact VARCHAR(100)
 );
 
@@ -14,14 +14,10 @@ CREATE TABLE IF NOT EXISTS patient (
     name VARCHAR(100) NOT NULL,
     age INT,
     gender VARCHAR(10),
-    diagnosis VARCHAR(255),
+    diagnosis VARCHAR(200),
     admitted_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO doctor (name, specialty, contact) VALUES
-('Dr. Priya Mehta', 'Cardiologist', '9876543210'),
-('Dr. Arjun Rao', 'Neurologist', '9988776655');
-
-INSERT INTO patient (doctor_id, name, age, gender, diagnosis) VALUES
-(1, 'Ravi Sharma', 45, 'Male', 'Hypertension'),
-(2, 'Sneha Iyer', 32, 'Female', 'Migraine');
+-- Sample data
+INSERT INTO doctor (name, specialty,contact) VALUES ('Dr. John Smith', 'Cardiology','8904292294');
+INSERT INTO patient (doctor_id, name, age, gender, diagnosis) VALUES (1, 'Alice', 30, 'Female', 'Hypertension');
