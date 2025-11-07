@@ -17,14 +17,14 @@ namespace AssuranceClinic.Infrastructure.Persistence
         public async Task<IEnumerable<Doctor>> GetDoctorsAsync()
         {
             using var conn = _connectionFactory();
-            var sql = "SELECT doctor_id as Id, name, specialty FROM doctor";
+            var sql = "SELECT doctor_id as Id, name, specialty,contact FROM doctor";
             return await conn.QueryAsync<Doctor>(sql);
         }
 
         public async Task<int> AddDoctorAsync(Doctor doctor)
         {
             using var conn = _connectionFactory();
-            var sql = "INSERT INTO doctor (name, specialty) VALUES (@Name, @Specialty)";
+            var sql = "INSERT INTO doctor (name, specialty,contact) VALUES (@Name, @Specialty,@Contact)";
             return await conn.ExecuteAsync(sql, doctor);
         }
     }
